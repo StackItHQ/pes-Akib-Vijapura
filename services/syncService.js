@@ -7,6 +7,11 @@ const syncGoogleSheetToDB = async () => {
     // Fetch data from Google Sheets (adjust range as needed)
     const sheetData = await googleSheetsService.readSheet('Sheet1!A2:D100');
     
+    if (!sheetData || sheetData.length === 0) {
+      console.log('No data found in Google Sheets.');
+      return;
+    }
+    
     // Create a set of emails from the sheet data
     const sheetEmails = new Set(sheetData.map(row => row[1])); // Assuming row[1] is email
     
@@ -23,7 +28,8 @@ const syncGoogleSheetToDB = async () => {
     }
 
     // Sync the remaining or new rows (existing code for updating/adding)
-    for (let row of sheetData) {
+    for (let rowIndex = 0; rowIndex < sheetData.length; rowIndex++) {
+      const row = sheetData[rowIndex];
       const [name, email, course, grade] = row;
 
       // Check if the student already exists in the database based on email
@@ -44,4 +50,31 @@ const syncGoogleSheetToDB = async () => {
   }
 };
 
-module.exports = { syncGoogleSheetToDB };
+const syncDBToGoogleSheet = async () => {
+  try {
+    // Fetch all students from the database
+    const students = await studentModel.getStudents();
+
+    // Fetch existing data from Google Sheets
+    const sheetData = await googleSheetsService.readSheet('Sheet1!A2:D100');
+    const sheetEmails = new Set(sheetData.map(row => row[1])); // Assuming row[1] is email
+
+    // Update or add new rows in Google Sheets
+    for (let student of students) {
+      const { name, email, course, grade } = student;
+      const existingRowIndex = sheetData.findIndex(row => row[1] === email); // Find index of row with the same email
+
+      if (existingRowIndex !== -1) {
+        // Update existing row
+        await googleSheetsService.updateRow(`Sheet1!A${existingRowIndex + 2}:D${existingRowIndex + 2}`, [name, email, course, grade]);
+      } else {
+        // Add new row
+        await googleSheetsService.appendRow('Sheet1!A1:D1', [name, email, course, grade]);
+      }
+    }
+  } catch (error) {
+    console.error('Error syncing DB with Google Sheets:', error);
+  }
+};
+
+module.exports = { syncGoogleSheetToDB, syncDBToGoogleSheet };

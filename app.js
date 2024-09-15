@@ -1,3 +1,4 @@
+// app.js
 const http = require('http');
 const socketIo = require('socket.io');
 const express = require('express');
@@ -5,7 +6,7 @@ const bodyParser = require('body-parser');
 const studentRoutes = require('./routers/studentRoutes');
 const studentModel = require('./models/studentModel');
 const schedule = require('node-schedule');
-const { syncGoogleSheetToDB } = require('./services/syncService');
+const { syncGoogleSheetToDB, syncDBToGoogleSheet } = require('./services/syncService');
 
 const app = express();
 const server = http.createServer(app);
@@ -27,7 +28,7 @@ app.use(bodyParser.json());
 // Use student routes
 app.use('/students', studentRoutes);
 
-// Manually call sync when needed (e.g., a button press, page load, etc.)
+// Sync routes
 app.get('/sync', async (req, res) => {
   try {
     await syncGoogleSheetToDB();
@@ -37,10 +38,21 @@ app.get('/sync', async (req, res) => {
   }
 });
 
+//Sync db to google sheet
+app.get('/sync-db', async (req, res) => {
+  try {
+    await syncDBToGoogleSheet();
+    res.status(200).json({ message: 'Database to Google Sheets sync completed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Sync failed', error: error.message });
+  }
+});
+
 // Schedule the sync every hour (example: minute sync)
 schedule.scheduleJob('*/1 * * * *', async () => {
   console.log('Running scheduled sync...');
   await syncGoogleSheetToDB();
+  await syncDBToGoogleSheet();
 });
 
 // Socket.IO

@@ -33,6 +33,69 @@ const googleSheetsService = {
       },
       auth: client
     });
+  },
+
+  // Update a row in Google Sheets
+  async updateRow(range, values) {
+    const client = await auth.getClient();
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range,
+      valueInputOption: 'RAW',
+      resource: {
+        values: [values]
+      },
+      auth: client
+    });
+  },
+
+  // Append a row to Google Sheets
+  async appendRow(range, values) {
+    const client = await auth.getClient();
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range,
+      valueInputOption: 'RAW',
+      resource: {
+        values: [values]
+      },
+      auth: client
+    });
+  },
+
+  // Delete a row from Google Sheets (requires range information)
+  async deleteRow(range) {
+    const client = await auth.getClient();
+    const sheetId = await googleSheetsService.getSheetId();
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: {
+        requests: [
+          {
+            deleteDimension: {
+              range: {
+                sheetId,
+                dimension: 'ROWS',
+                startIndex: range.startIndex,
+                endIndex: range.endIndex,
+              }
+            }
+          }
+        ]
+      },
+      auth: client
+    });
+  },
+
+  // Get Sheet ID from the spreadsheet
+  async getSheetId() {
+    const client = await auth.getClient();
+    const response = await sheets.spreadsheets.get({
+      spreadsheetId,
+      auth: client
+    });
+    const sheet = response.data.sheets.find(s => s.properties.title === 'Sheet1'); // Adjust sheet name if needed
+    return sheet.properties.sheetId;
   }
 };
 
