@@ -1,3 +1,4 @@
+// services/syncService.js
 const studentModel = require('../models/studentModel');
 const googleSheetsService = require('./googleSheetsService');
 
@@ -9,16 +10,17 @@ const syncGoogleSheetToDB = async () => {
     for (let row of sheetData) {
       const [name, email, course, grade] = row;
 
-      // Check if the student already exists in the database
-      const existingStudents = await studentModel.getStudents();
-      const studentExists = existingStudents.some(student => student.email === email);
+      // Check if the student already exists in the database based on email
+      const existingStudent = await studentModel.getStudentByEmail(email);
 
-      if (!studentExists) {
-        // If the student does not exist, add them to the database
-        await studentModel.addStudent(name, email, course, grade);
-        console.log(`Added student ${name} to the database`);
+      if (existingStudent) {
+        // If the student exists, update the record
+        await studentModel.updateStudentByEmail(email, name, course, grade);
+        console.log(`Updated student ${name} with email ${email}`);
       } else {
-        console.log(`Student with email ${email} already exists`);
+        // If the student doesn't exist, add them to the database
+        await studentModel.addStudent(name, email, course, grade);
+        console.log(`Added new student ${name} with email ${email}`);
       }
     }
   } catch (error) {

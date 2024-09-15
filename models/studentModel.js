@@ -1,4 +1,4 @@
-const pool = require('../config/dbConfig'); // Import the configured pool
+const pool = require('../config/dbConfig');
 
 // Create table with course and grade
 const createTable = async () => {
@@ -22,10 +22,25 @@ const addStudent = async (name, email, course, grade) => {
   return result.rows[0];
 };
 
+// Get a student by email
+const getStudentByEmail = async (email) => {
+  const result = await pool.query('SELECT * FROM students WHERE email = $1', [email]);
+  return result.rows[0];
+};
+
+// Update a student by email
+const updateStudentByEmail = async (email, name, course, grade) => {
+  const result = await pool.query(
+    'UPDATE students SET name = $1, course = $2, grade = $3 WHERE email = $4 RETURNING *',
+    [name, course, grade, email]
+  );
+  return result.rows[0];
+};
+
 // Get all students
 const getStudents = async () => {
   const result = await pool.query('SELECT * FROM students');
   return result.rows;
 };
 
-module.exports = { createTable, addStudent, getStudents };
+module.exports = { createTable, addStudent, getStudents, getStudentByEmail, updateStudentByEmail };
