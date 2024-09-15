@@ -1,4 +1,3 @@
-// services/syncService.js
 const studentModel = require('../models/studentModel');
 const googleSheetsService = require('./googleSheetsService');
 
@@ -57,7 +56,10 @@ const syncDBToGoogleSheet = async () => {
 
     // Fetch existing data from Google Sheets
     const sheetData = await googleSheetsService.readSheet('Sheet1!A2:D100');
-    const sheetEmails = new Set(sheetData.map(row => row[1])); // Assuming row[1] is email
+    //const sheetEmails = new Set(sheetData.map(row => row[1])); // Assuming row[1] is email
+
+    // Track rows that need to be deleted from the sheet
+    const rowsToDelete = [];
 
     // Update or add new rows in Google Sheets
     for (let student of students) {
@@ -71,6 +73,22 @@ const syncDBToGoogleSheet = async () => {
         // Add new row
         await googleSheetsService.appendRow('Sheet1!A1:D1', [name, email, course, grade]);
       }
+    }
+
+    // Identify rows that exist in the sheet but not in the DB and mark for deletion
+    for (let rowIndex = 0; rowIndex < sheetData.length; rowIndex++) {
+      const [_, email] = sheetData[rowIndex];  // Assuming row[1] is email
+
+      if (!students.find(student => student.email === email)) {
+        // If the student email is in Google Sheets but not in the database, mark the row for deletion
+        rowsToDelete.push(rowIndex + 2);  // Sheet rows are 1-based index, add 2 to match the correct row in Google Sheets
+      }
+    }
+
+    // Delete rows from Google Sheets in reverse order to avoid shifting indices
+    for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+      await googleSheetsService.deleteRow(rowsToDelete[i]);
+      console.log(`Deleted row ${rowsToDelete[i]} from Google Sheets`);
     }
   } catch (error) {
     console.error('Error syncing DB with Google Sheets:', error);

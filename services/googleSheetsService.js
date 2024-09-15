@@ -9,7 +9,7 @@ const auth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets']
 });
 
-const spreadsheetId = '1RJ9AHDTZid-IG1PYnf-dgGlnKGtCyTveV38Uhq6WQIA'; // Replace with your Google Sheet ID
+const spreadsheetId = '1n1g1SuQsImvDBnFEY5C6XMyxgY7Jviea2Ww2Uy8YQ-8'; // Replace with your Google Sheet ID
 
 const googleSheetsService = {
   async readSheet(range) {
@@ -64,28 +64,35 @@ const googleSheetsService = {
   },
 
   // Delete a row from Google Sheets (requires range information)
-  async deleteRow(range) {
-    const client = await auth.getClient();
-    const sheetId = await googleSheetsService.getSheetId();
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      resource: {
-        requests: [
-          {
-            deleteDimension: {
-              range: {
-                sheetId,
-                dimension: 'ROWS',
-                startIndex: range.startIndex,
-                endIndex: range.endIndex,
-              }
+  async deleteRow (rowNumber){
+  const client = await auth.getClient();
+  const request = {
+    spreadsheetId: spreadsheetId,
+    resource: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: 0,  // The sheetId, adjust based on your sheet's ID
+              dimension: 'ROWS',
+              startIndex: rowNumber - 1,  // Zero-based index, rowNumber is 1-based
+              endIndex: rowNumber
             }
           }
-        ]
-      },
-      auth: client
-    });
-  },
+        }
+      ]
+    },
+    auth: client
+  };
+
+  try {
+    await sheets.spreadsheets.batchUpdate(request);
+    console.log(`Deleted row ${rowNumber} successfully.`);
+  } catch (error) {
+    console.error('Error deleting row:', error);
+  }
+},
+
 
   // Get Sheet ID from the spreadsheet
   async getSheetId() {
