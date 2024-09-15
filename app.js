@@ -1,4 +1,3 @@
-// app.js
 const http = require('http');
 const socketIo = require('socket.io');
 const express = require('express');
@@ -7,6 +6,7 @@ const studentRoutes = require('./routers/studentRoutes');
 const studentModel = require('./models/studentModel');
 const schedule = require('node-schedule');
 const { syncGoogleSheetToDB, syncDBToGoogleSheet } = require('./services/syncService');
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
@@ -19,6 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
+app.use(cors());
 
 // Initialize the database
 (async () => {

@@ -1,4 +1,5 @@
 const studentModel = require('../models/studentModel');
+const googleSheetsService = require("../services/googleSheetsService")
 
 const getStudents = async (req, res) => {
     try {
@@ -95,10 +96,22 @@ const deleteStudent = async (req, res) => {
     }
 }
 
+// Connect to Google Sheet
+const connectToSheet =  async (req, res) => {
+  try {
+    const { spreadsheetId } = req.body;
+    googleSheetsService.setSpreadsheetId(spreadsheetId); // Store the ID
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 
 module.exports = {
     getStudents,
     createStudent,
     updateStudent,
-    deleteStudent
+    deleteStudent,
+    connectToSheet
 }

@@ -4,7 +4,8 @@ const {
   getStudents,
   createStudent,
   updateStudent,
-  deleteStudent
+  deleteStudent,
+  connectToSheet
 } = require('../controller/sheetController');
 
 // Route to get all students
@@ -18,5 +19,8 @@ router.route("/:email").put(updateStudent);
 
 //Route to delete an existing student by email
 router.route("/:email").delete(deleteStudent);
+
+//Route to connect to google sheet
+router.route("/connect").post(connectToSheet);
 
 module.exports = router;

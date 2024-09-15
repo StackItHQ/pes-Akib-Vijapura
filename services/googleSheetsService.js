@@ -9,9 +9,15 @@ const auth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets']
 });
 
-const spreadsheetId = '1n1g1SuQsImvDBnFEY5C6XMyxgY7Jviea2Ww2Uy8YQ-8'; // Replace with your Google Sheet ID
+let spreadsheetId = '1n1g1SuQsImvDBnFEY5C6XMyxgY7Jviea2Ww2Uy8YQ-8'; // Replace with your Google Sheet ID
 
 const googleSheetsService = {
+
+   setSpreadsheetId(id) {
+    spreadsheetId = id;
+    console.log("id" ,spreadsheetId )
+  },
+
   async readSheet(range) {
     const client = await auth.getClient();
     const response = await sheets.spreadsheets.values.get({
