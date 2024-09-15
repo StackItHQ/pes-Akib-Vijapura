@@ -37,10 +37,16 @@ const updateStudentByEmail = async (email, name, course, grade) => {
   return result.rows[0];
 };
 
+// Delete a student by email
+const deleteStudentByEmail = async (email) => {
+  const result = await pool.query('DELETE FROM students WHERE email = $1 RETURNING *', [email]);
+  return result.rows[0];
+};
+
 // Get all students
 const getStudents = async () => {
   const result = await pool.query('SELECT * FROM students');
   return result.rows;
 };
 
-module.exports = { createTable, addStudent, getStudents, getStudentByEmail, updateStudentByEmail };
+module.exports = { createTable, addStudent, getStudents, getStudentByEmail, updateStudentByEmail, deleteStudentByEmail };

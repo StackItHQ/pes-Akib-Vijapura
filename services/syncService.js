@@ -7,6 +7,22 @@ const syncGoogleSheetToDB = async () => {
     // Fetch data from Google Sheets (adjust range as needed)
     const sheetData = await googleSheetsService.readSheet('Sheet1!A2:D100');
     
+    // Create a set of emails from the sheet data
+    const sheetEmails = new Set(sheetData.map(row => row[1])); // Assuming row[1] is email
+    
+    // Fetch all students from the database
+    const existingStudents = await studentModel.getStudents();
+
+    // Compare and delete any students in the DB but not in Google Sheets
+    for (let student of existingStudents) {
+      if (!sheetEmails.has(student.email)) {
+        // If the student email is not in the Google Sheets data, delete from DB
+        await studentModel.deleteStudentByEmail(student.email);
+        console.log(`Deleted student with email ${student.email} from the database`);
+      }
+    }
+
+    // Sync the remaining or new rows (existing code for updating/adding)
     for (let row of sheetData) {
       const [name, email, course, grade] = row;
 
