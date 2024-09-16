@@ -74,25 +74,35 @@ const App = () => {
   const syncToSheet = async () => {
     try {
       await axios.get('http://localhost:5100/sync');
-      console.log('Synced to sheet successfully');
+      alert('Synced to db successfully');
     } catch (error) {
-      console.error('Error syncing to sheet:', error);
+      alert('Error syncing to db:', error);
     }
   };
 
   const syncToDb = async () => {
     try {
       await axios.get('http://localhost:5100/sync-db');
-      console.log('Synced to DB successfully');
+      alert('Synced to sheet successfully');
     } catch (error) {
-      console.error('Error syncing to DB:', error);
+      alert('Error syncing to sheet:', error);
     }
   };
+
+  const connectNewSheet = async () => {
+    try {
+      setConnected(false)
+      console.log('connect to new sheet successfully');
+    } catch (error) {
+      console.error('Error connect to new sheet:', error);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center p-6">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl p-8">
-        <h1 className="text-4xl font-bold text-gray-900 text-center mb-8 border-b-2 border-gray-300 pb-4">Student Management System</h1>
+        <h1 className="text-4xl font-bold text-gray-900 text-center mb-8 border-b-2 border-gray-300 pb-4">Superjoin Assignment by Akib Vijapura 💪</h1>
 
         {!connected ? (
           <div className="text-center">
@@ -243,15 +253,22 @@ const App = () => {
                 className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition duration-300 flex items-center"
                 onClick={syncToSheet}
               >
-                Sync to Sheet
-                <FaSync className="ml-2" />
+                Sync to DB
+                <FaDatabase className="ml-2" />
               </button>
               <button
                 className="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition duration-300 flex items-center"
                 onClick={syncToDb}
               >
-                Sync to DB
-                <FaDatabase className="ml-2" />
+                Sync to  Sheet
+                <FaSync className="ml-2" />
+              </button>
+              <button
+                className="bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition duration-300 flex items-center"
+                onClick={connectNewSheet}
+              >
+                Connect to new sheet
+                <FaSync className="ml-2" />
               </button>
             </div>
           </div>
