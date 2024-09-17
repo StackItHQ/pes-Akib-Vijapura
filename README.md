@@ -59,7 +59,7 @@ We're available at techhiring@superjoin.ai for all queries.
 All the best ✨.
 
 ## Developer's Section
-Uff 😮‍💨 So You Finally Landed Here! Get ready and sit your butt tight because you're about to dive into the nitty-gritty of how this real-time synchronization system between Google Sheets and a PostgreSQL database works. Let's break down the components, APIs, and the overall architecture that make this magic happen! 🚀
+Uff 😮‍💨 So You Finally Landed Here! Get ready and sit your tight because you're about to dive into the nitty-gritty of how this real-time synchronization system between Google Sheets and a PostgreSQL database works. Let's break down the components, APIs, and the overall architecture that make this magic happen! 🚀
 
 ## Project Structure
 Here's a quick overview of the project's file structure to help you navigate through the codebase:
